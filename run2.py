@@ -620,47 +620,15 @@ def generate_samples(raw_data, batch_size):
 
 
 def generate_data(dataset, key):
-    # load data
-    if dataset in custom_datasets.DATASETS:
-        data = custom_datasets.load(dataset, cache_dir)
-    else:
-        data = datasets.load_dataset(dataset, split='train', cache_dir=cache_dir)[key]
+    
+    dataset = datasets.load_dataset("symanto/autextification2023","detection_en")
 
-    # get unique examples, strip whitespace, and remove newlines
-    # then take just the long examples, shuffle, take the first 5,000 to tokenize to save time
-    # then take just the examples that are <= 512 tokens (for the mask model)
-    # then generate n_samples samples
+    data = {
+        "original": dataset.filter(lambda x: x["label"] == 0)['train']['text'],
+        "sampled": dataset.filter(lambda x: x["label"] == 1)['train']['text']
+    }
 
-    # remove duplicates from the data
-    data = list(dict.fromkeys(data))  # deterministic, as opposed to set()
-
-    # strip whitespace around each example
-    data = [x.strip() for x in data]
-
-    # remove newlines from each example
-    data = [strip_newlines(x) for x in data]
-
-    # try to keep only examples with > 250 words
-    if dataset in ['writing', 'squad', 'xsum']:
-        long_data = [x for x in data if len(x.split()) > 250]
-        if len(long_data) > 0:
-            data = long_data
-
-    random.seed(0)
-    random.shuffle(data)
-
-    data = data[:5_000]
-
-    # keep only examples with <= 512 tokens according to mask_tokenizer
-    # this step has the extra effect of removing examples with low-quality/garbage content
-    tokenized_data = preproc_tokenizer(data)
-    data = [x for x, y in zip(data, tokenized_data["input_ids"]) if len(y) <= 512]
-
-    # print stats about remainining data
-    print(f"Total number of samples: {len(data)}")
-    print(f"Average number of words: {np.mean([len(x.split()) for x in data])}")
-
-    return generate_samples(data[:n_samples], batch_size=batch_size)
+    return data
 
 
 def load_base_model_and_tokenizer(name):
