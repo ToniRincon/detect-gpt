@@ -619,13 +619,13 @@ def generate_samples(raw_data, batch_size):
     return data
 
 
-def generate_data(dataset, key):
+def generate_data():
     
     dataset = datasets.load_dataset("symanto/autextification2023","detection_en")
 
     data = {
-        "original": dataset.filter(lambda x: x["label"] == 0)['train']['text'],
-        "sampled": dataset.filter(lambda x: x["label"] == 1)['train']['text']
+        "original": dataset.filter(lambda x: x["label"] == 0)['train']['text'][:5000],
+        "sampled": dataset.filter(lambda x: x["label"] == 1)['train']['text'][:5000]
     }
 
     return data
@@ -818,8 +818,8 @@ if __name__ == '__main__':
 
     load_base_model()
 
-    print(f'Loading dataset {args.dataset}...')
-    data = generate_data(args.dataset, args.dataset_key)
+    print(f'Loading dataset textauticator ...')
+    data = generate_data()
     if args.random_fills:
         FILL_DICTIONARY = set()
         for texts in data.values():
