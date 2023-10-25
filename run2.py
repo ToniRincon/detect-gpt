@@ -624,8 +624,8 @@ def generate_data():
     dataset = datasets.load_dataset("symanto/autextification2023","detection_en")
 
     data = {
-        "original": dataset.filter(lambda x: x["label"] == 0)['train']['text'][:5000],
-        "sampled": dataset.filter(lambda x: x["label"] == 1)['train']['text'][:5000]
+        "original": dataset.filter(lambda x: x["label"] == 0)['train']['text'][:500],
+        "sampled": dataset.filter(lambda x: x["label"] == 1)['train']['text'][:500]
     }
 
     return data
